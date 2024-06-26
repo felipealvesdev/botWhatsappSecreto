@@ -3,7 +3,7 @@ const axios = require('axios');
 
 venom.create({
     session: 'session-name'
-    })
+})
     .then((client) => {
         start(client);
 
@@ -46,6 +46,8 @@ const start = (client) => {
                 payment: null,
                 selectedMenu: null,
                 cityName: null,
+                name: null,
+                dateOfBirth: null
             };
         }
 
@@ -56,7 +58,7 @@ const start = (client) => {
 async function handleStage(client, message, user) {
     switch (user.stage) {
         case 0:
-            await client.sendText(message.from, 'Olá! Escolha uma opção:\n1: Saber mais informações sobre este bot\n2: Ver a temperatura em uma cidade\n3: Fazer pedido de pizza');
+            await client.sendText(message.from, 'Olá! Escolha uma opção:\n1: Saber mais informações sobre este bot\n2: Ver a temperatura em uma cidade\n3: Fazer pedido de pizza\n4: Digitar informações pessoais');
             user.stage = 1;
             break;
         case 1:
@@ -83,8 +85,12 @@ async function handleStage(client, message, user) {
                     await client.sendText(message.from, 'Qual pizza você gostaria de pedir?');
                     user.stage = 4;
                     break;
+                case '4':
+                    await client.sendText(message.from, 'Por favor, digite seu nome:');
+                    user.stage = 7;
+                    break;
                 default:
-                    await client.sendText(message.from, 'Opção inválida. Por favor, escolha uma opção válida:\n1: Saber mais informações sobre este bot\n2: Ver a temperatura em uma cidade\n3: Fazer pedido de pizza');
+                    await client.sendText(message.from, 'Opção inválida. Por favor, escolha uma opção válida:\n1: Saber mais informações sobre este bot\n2: Ver a temperatura em uma cidade\n3: Fazer pedido de pizza\n4: Digitar informações pessoais');
                     user.stage = 1;
                     break;
             }
@@ -120,6 +126,24 @@ async function handleStage(client, message, user) {
         case 6:
             user.payment = message.body;
             await client.sendText(message.from, `Resumo do pedido:\n- Pizza: ${user.order}\n- Endereço: ${user.address}\n- Pagamento: ${user.payment}\n\nObrigado pelo seu pedido!`);
+            user.stage = 0;
+            break;
+        case 7:
+            user.name = message.body;
+            await client.sendText(message.from, 'Por favor, digite sua data de nascimento (YYYY-MM-DD):');
+            user.stage = 8;
+            break;
+        case 8:
+            user.dateOfBirth = message.body;
+            try {
+                await axios.post('http://localhost:8080/authors', {
+                    name: user.name,
+                    dateOfBirth: user.dateOfBirth
+                });
+                await client.sendText(message.from, `Obrigado! As informações foram enviadas:\n- Nome: ${user.name}\n- Data de Nascimento: ${user.dateOfBirth}. Por favor, confira no banco de dados para ter certeza de que os dados foram salvos.`);
+            } catch (error) {
+                await client.sendText(message.from, 'Desculpe, houve um problema ao enviar suas informações. Tente novamente mais tarde.');
+            }
             user.stage = 0;
             break;
         default:
