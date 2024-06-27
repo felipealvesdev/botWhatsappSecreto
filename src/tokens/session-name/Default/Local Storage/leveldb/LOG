@@ -1,6 +1,6 @@
-2024/06/25-14:09:50.939 43f0 Reusing MANIFEST C:\Users\Felipe\Documents\SoftexBolsa\projectBeta\src\tokens\session-name\Default\Local Storage\leveldb/MANIFEST-000001
-2024/06/25-14:09:50.944 43f0 Recovering log #20
-2024/06/25-14:09:50.946 43f0 Reusing old log C:\Users\Felipe\Documents\SoftexBolsa\projectBeta\src\tokens\session-name\Default\Local Storage\leveldb/000020.log 
-2024/06/25-14:11:54.152 2468 Level-0 table #24: started
-2024/06/25-14:11:54.155 2468 Level-0 table #24: 21707 bytes OK
-2024/06/25-14:11:54.158 2468 Delete type=0 #20
+2024/06/27-15:50:00.317 4608 Reusing MANIFEST C:\Users\Felipe\Documents\SoftexBolsa\projectBeta\src\tokens\session-name\Default\Local Storage\leveldb/MANIFEST-000001
+2024/06/27-15:50:00.322 4608 Recovering log #23
+2024/06/27-15:50:00.322 4608 Reusing old log C:\Users\Felipe\Documents\SoftexBolsa\projectBeta\src\tokens\session-name\Default\Local Storage\leveldb/000023.log 
+2024/06/27-15:51:00.653 2258 Level-0 table #27: started
+2024/06/27-15:51:00.656 2258 Level-0 table #27: 17913 bytes OK
+2024/06/27-15:51:00.658 2258 Delete type=0 #23

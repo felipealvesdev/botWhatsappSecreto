@@ -47,7 +47,9 @@ const start = (client) => {
                 selectedMenu: null,
                 cityName: null,
                 name: null,
-                dateOfBirth: null
+                dateOfBirth: null,
+                selectedSubMenu: null,
+                id: null
             };
         }
 
@@ -86,8 +88,8 @@ async function handleStage(client, message, user) {
                     user.stage = 4;
                     break;
                 case '4':
-                    await client.sendText(message.from, 'Por favor, digite seu nome:');
-                    user.stage = 7;
+                    await client.sendText(message.from, 'Escolha uma opção:\n1: Listar informações\n2: Adicionar informações\n3: Atualizar informações\n4: Excluir informações');
+                    user.stage = 9;
                     break;
                 default:
                     await client.sendText(message.from, 'Opção inválida. Por favor, escolha uma opção válida:\n1: Saber mais informações sobre este bot\n2: Ver a temperatura em uma cidade\n3: Fazer pedido de pizza\n4: Digitar informações pessoais');
@@ -143,6 +145,72 @@ async function handleStage(client, message, user) {
                 await client.sendText(message.from, `Obrigado! As informações foram enviadas:\n- Nome: ${user.name}\n- Data de Nascimento: ${user.dateOfBirth}. Por favor, confira no banco de dados para ter certeza de que os dados foram salvos.`);
             } catch (error) {
                 await client.sendText(message.from, 'Desculpe, houve um problema ao enviar suas informações. Tente novamente mais tarde.');
+            }
+            user.stage = 0;
+            break;
+        case 9:
+            user.selectedSubMenu = message.body;
+            switch (user.selectedSubMenu) {
+                case '1':
+                    try {
+                        const response = await axios.get('http://localhost:8080/authors');
+                        const authors = response.data;
+                        let authorsList = 'Lista de autores:\n';
+                        authors.forEach((author, index) => {
+                            authorsList += `${index + 1}. id: ${author.id} Nome: ${author.name}, Data de Nascimento: ${author.dateOfBirth}\n`;
+                        });
+                        await client.sendText(message.from, authorsList);
+                    } catch (error) {
+                        await client.sendText(message.from, 'Desculpe, houve um problema ao listar as informações. Tente novamente mais tarde.');
+                    }
+                    user.stage = 0;
+                    break;
+                case '2':
+                    await client.sendText(message.from, 'Por favor, digite seu nome:');
+                    user.stage = 7;
+                    break;
+                case '3':
+                    await client.sendText(message.from, 'Por favor, digite o ID do autor que deseja atualizar:');
+                    user.stage = 10;
+                    break;
+                case '4':
+                    await client.sendText(message.from, 'Por favor, digite o ID do autor que deseja excluir:');
+                    user.stage = 12;
+                    break;
+                default:
+                    await client.sendText(message.from, 'Opção inválida. Por favor, escolha uma opção válida:\n1: Listar informações\n2: Adicionar informações\n3: Atualizar informações\n4: Excluir informações');
+                    user.stage = 9;
+                    break;
+            }
+            break;
+        case 10:
+            user.id = message.body;
+            await client.sendText(message.from, 'Por favor, digite seu nome:');
+            user.stage = 11;
+            break;
+        case 11:
+            user.name = message.body;
+            await client.sendText(message.from, 'Por favor, digite sua data de nascimento (YYYY-MM-DD):');
+            user.stage = 8;
+            try {
+                await axios.put(`http://localhost:8080/authors/${user.id}`, {
+                    name: user.name,
+                    dateOfBirth: user.dateOfBirth
+                });
+                await client.sendText(message.from, `Obrigado! As informações foram atualizadas:\n- Nome: ${user.name}\n- Data de Nascimento: ${user.dateOfBirth}. Por favor, confira no banco de dados para ter certeza de que os dados foram salvos.`);
+            } catch (error) {
+                await client.sendText(message.from, 'Desculpe, houve um problema ao atualizar suas informações. Tente novamente mais tarde.');
+                console.log(error);
+            }
+            user.stage = 0;
+            break;
+        case 12:
+            user.id = message.body;
+            try {
+                await axios.delete(`http://localhost:8080/authors/${user.id}`);
+                await client.sendText(message.from, `As informações do autor com ID ${user.id} foram excluídas com sucesso.`);
+            } catch (error) {
+                await client.sendText(message.from, 'Desculpe, houve um problema ao excluir as informações. Tente novamente mais tarde.');
             }
             user.stage = 0;
             break;
