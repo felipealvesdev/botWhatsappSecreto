@@ -175,7 +175,7 @@ async function handleStage(client, message, user) {
                     break;
                 case '4':
                     await client.sendText(message.from, 'Por favor, digite o ID do autor que deseja excluir:');
-                    user.stage = 12;
+                    user.stage = 13;
                     break;
                 default:
                     await client.sendText(message.from, 'Opção inválida. Por favor, escolha uma opção válida:\n1: Listar informações\n2: Adicionar informações\n3: Atualizar informações\n4: Excluir informações');
@@ -191,7 +191,10 @@ async function handleStage(client, message, user) {
         case 11:
             user.name = message.body;
             await client.sendText(message.from, 'Por favor, digite sua data de nascimento (YYYY-MM-DD):');
-            user.stage = 8;
+            user.stage = 12;
+            break;
+        case 12:
+            user.dateOfBirth = message.body;
             try {
                 await axios.put(`http://localhost:8080/authors/${user.id}`, {
                     name: user.name,
@@ -204,7 +207,7 @@ async function handleStage(client, message, user) {
             }
             user.stage = 0;
             break;
-        case 12:
+        case 13:
             user.id = message.body;
             try {
                 await axios.delete(`http://localhost:8080/authors/${user.id}`);
